@@ -1,5 +1,6 @@
 package Client;
 
+import Server.DCustomer;
 import Server.IFDbOperations;
 
 import java.rmi.NotBoundException;
@@ -7,6 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.sql.SQLException;
+import java.util.List;
 
 import static Client.ConnectionContract.*;
 
@@ -20,7 +22,10 @@ public class Client {
             Registry reg = LocateRegistry.getRegistry("localhost",1099);
             IFDbOperations op = (IFDbOperations) reg.lookup("jdbc:oracle");
             op.authorize(JDBC_CON_URL, JDBC_CON_USER, JDBC_CON_PW);
-            op.select("DCUSTOMER");
+            List<DCustomer> customers = (List<DCustomer>) op.select("DCUSTOMER");
+            for (DCustomer c : customers) {
+                System.out.println(c);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {

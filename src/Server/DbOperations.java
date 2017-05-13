@@ -1,7 +1,8 @@
 package Server;
-import Server.DCustomer;
 import java.rmi.RemoteException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,8 +21,8 @@ public class DbOperations implements IFDbOperations {
     }
 
     @Override
-    public void select(String table) throws RemoteException, SQLException {
-
+    public List<DCustomer> select(String table) throws RemoteException, SQLException {
+        List<DCustomer> customers = new ArrayList<DCustomer>();
         try {
             Map map = con.getTypeMap();
             map.put("CUSTOMER_DATA", Class.forName("Server.DCustomer"));
@@ -33,16 +34,20 @@ public class DbOperations implements IFDbOperations {
         }
         if(con != null) {
             try {
-                Statement stmt = con.createStatement();
+                Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                 ResultSet rs = stmt.executeQuery("SELECT * FROM DCUSTOMER");
                 int custNo = 0;
                 rs.beforeFirst();
-                while(rs.next())
+                while(rs.next()) {
                     custNo = rs.getInt("CSID");
-                int csid = rs.getInt("CUSTID");
+                    int csid = rs.getInt("CUSTID");
                     System.out.println(custNo + " " +csid);
                     System.out.println((String) rs.getString("NAME"));
-                   // System.out.println(customer);
+                    customers.add(new DCustomer(rs.getInt("CSID"), rs.getInt("CUSTID"), rs.getString("NAME"), rs.getString("PLACE"),
+                            rs.getString("STATE"), rs.getString("COUNTRY")));
+                    // System.out.println(customer);
+                }
+
                  stmt.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -52,5 +57,6 @@ public class DbOperations implements IFDbOperations {
         }
 
 
+        return customers;
     }
 }

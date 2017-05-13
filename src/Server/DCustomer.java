@@ -9,7 +9,7 @@ import java.sql.SQLOutput;
 /**
  * Created by Faßreiter on 08.05.2017.
  */
-public class DCustomer implements SQLData   {
+public class DCustomer implements SQLData, Serializable  {
     private int csid;
     private int custid;
     private String name;

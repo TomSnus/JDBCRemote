@@ -1,8 +1,6 @@
 package Server;
 import java.rmi.RemoteException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,8 +19,9 @@ public class DbOperations implements IFDbOperations {
     }
 
     @Override
-    public List<DCustomer> select(String table) throws RemoteException, SQLException {
-        List<DCustomer> customers = new ArrayList<DCustomer>();
+    public DbSet select(String sql) throws RemoteException, SQLException {
+        ResultSet rs = null;
+        DbSet dbo = new DbSet();
         try {
             Map map = con.getTypeMap();
             map.put("CUSTOMER_DATA", Class.forName("Server.DCustomer"));
@@ -35,28 +34,27 @@ public class DbOperations implements IFDbOperations {
         if(con != null) {
             try {
                 Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM DCUSTOMER");
-                int custNo = 0;
-                rs.beforeFirst();
-                while(rs.next()) {
-                    custNo = rs.getInt("CSID");
-                    int csid = rs.getInt("CUSTID");
-                    System.out.println(custNo + " " +csid);
-                    System.out.println((String) rs.getString("NAME"));
-                    customers.add(new DCustomer(rs.getInt("CSID"), rs.getInt("CUSTID"), rs.getString("NAME"), rs.getString("PLACE"),
-                            rs.getString("STATE"), rs.getString("COUNTRY")));
-                    // System.out.println(customer);
-                }
+                rs = stmt.executeQuery(sql);
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int columnsNumber = rsmd.getColumnCount();
 
-                 stmt.close();
+                rs.beforeFirst();
+                while (rs.next()) {
+                    DbObject dbobject = new DbObject();
+                   for(int i = 1; i <= columnsNumber; i++) {
+                       dbobject.add(rs.getObject(i));
+                   }
+                   dbo.add(dbobject);
+
+                }
+                stmt.close();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
 
             }
         }
-
-
-        return customers;
+        return dbo;
     }
+
 }

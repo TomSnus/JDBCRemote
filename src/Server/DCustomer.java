@@ -1,6 +1,7 @@
 package Server;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.SQLData;
 import java.sql.SQLException;
 import java.sql.SQLInput;
@@ -10,8 +11,8 @@ import java.sql.SQLOutput;
  * Created by Faßreiter on 08.05.2017.
  */
 public class DCustomer implements SQLData, Serializable  {
-    private int csid;
-    private int custid;
+    private BigDecimal csid;
+    private BigDecimal custid;
     private String name;
     private String place;
     private String state;
@@ -20,7 +21,7 @@ public class DCustomer implements SQLData, Serializable  {
     //SQL DATA
     private String sqlUdt;
 
-    public DCustomer(int csid, int custid, String name, String place, String state, String country) {
+    public DCustomer(BigDecimal csid, BigDecimal custid, String name, String place, String state, String country) {
         this.csid = csid;
         this.custid = custid;
         this.name = name;
@@ -29,19 +30,19 @@ public class DCustomer implements SQLData, Serializable  {
         this.country = country;
     }
 
-    public int getCsid() {
+    public BigDecimal getCsid() {
         return csid;
     }
 
-    public void setCsid(int csid) {
+    public void setCsid(BigDecimal csid) {
         this.csid = csid;
     }
 
-    public int getCustid() {
+    public BigDecimal getCustid() {
         return custid;
     }
 
-    public void setCustid(int custid) {
+    public void setCustid(BigDecimal custid) {
         this.custid = custid;
     }
 
@@ -97,8 +98,8 @@ public class DCustomer implements SQLData, Serializable  {
     @Override
     public void readSQL(SQLInput stream, String typeName) throws SQLException {
         sqlUdt = typeName;
-        custid = stream.readInt();
-        csid = stream.readInt();
+        custid = stream.readBigDecimal();
+        csid = stream.readBigDecimal();
         name = stream.readString();
         country = stream.readString();
         place = stream.readNString();
@@ -107,8 +108,8 @@ public class DCustomer implements SQLData, Serializable  {
 
     @Override
     public void writeSQL(SQLOutput stream) throws SQLException {
-        stream.writeInt(csid);
-        stream.writeInt(custid);
+        stream.writeBigDecimal(csid);
+        stream.writeBigDecimal(custid);
         stream.writeString(name);
         stream.writeString(country);
         stream.writeString(place);
